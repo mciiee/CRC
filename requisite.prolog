@@ -1,9 +1,5 @@
 
-contains([Element|_], Element).
-contains([_|Tail], Element) :- contains(Tail, Element).
-
-% intersect(List, [FirstElements|OtherElements]) :- contains(List, FirstElements), contains(List, OtherElements).
-
+% library(lists).
 
 corequisite("MATH 273", "MATH 162").
 
@@ -28,12 +24,22 @@ prerequisite("MATH 460", "MATH 361").
 
 prerequisite("MATH 461", "MATH 361").
 
-
+%  prerequisite("MATH 461", "MATH 361"): MATH 461 -> MATH 361
 
 prerequisite(Course, Requisite) :- corequisite(Course, Requisite).
-
+% prerequisite(Course, Requisite) :- atom(Course), atom(Requisite), prerequisite(Course, Prerequisite), prerequisite(Prerequisite, Requisite).
 
 prerequisites(Course, Requisite) :- prerequisite(Course, Requisite).
 prerequisites(Course, Requisite) :- prerequisite(Middle, Requisite), prerequisites(Course, Middle).
 
-prerequisites_list(Course, ReducedRequisites) :- findall(Requisite, prerequisites(Course, Requisite), Requisites), list_to_set(Requisites, ReducedRequisites).
+prerequisites_list(Course, Requisites) :- 
+    setof(Requisite, prerequisites(Course, Requisite), Requisites). 
+    % reverse(Requisites, ReversedReducedRequisites).
+
+% requisites_to_ugraph(Predicate, Course, Graph) :-  Predicate(Course, Requisite), Graph = [Course-[Requsite]].
+% prerequisites_to_ugraph(Course, Graph) :-  requisites_to_ugraph(prerequisite, Course, Graph).
+
+% prerequisite_sorted([]).
+prerequisite_sorted([_]).
+prerequisite_sorted([Course, Requisite]) :- \+(prerequisites(Course, Requisite)).
+prerequisite_sorted([Course|[Requisite|Tail]]) :- prerequisite_sorted([Course, Requisite]), prerequisite_sorted([Requisite|Tail]).
