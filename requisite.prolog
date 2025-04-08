@@ -1,45 +1,49 @@
 
 % library(lists).
 
-corequisite("MATH 273", "MATH 162").
+corequisite("MATH 273", ["MATH 162"]).
 
 
-prerequisite("MATH 162", "MATH 161").
+prerequisites("MATH 162", ["MATH 161"]).
 
-prerequisite("MATH 251", "MATH 161").
+prerequisites("MATH 251", ["MATH 161"]).
 
-prerequisite("MATH 263", "MATH 162").
+prerequisites("MATH 273", ["MATH 161"]).
 
-prerequisite("MATH 273", "MATH 161").
+prerequisites("MATH 302", ["MATH 251", "MATH 273"]).
 
-prerequisite("MATH 302", "MATH 251").
-prerequisite("MATH 302", "MATH 273").
+prerequisites("MATH 361", ["MATH 251", "MATH 263"]).
 
-prerequisite("MATH 361", "MATH 251").
-prerequisite("MATH 361", "MATH 263").
+prerequisites("MATH 403", ["MATH 302"]).
 
-prerequisite("MATH 403", "MATH 302").
+prerequisites("MATH 460", ["MATH 361"]).
 
-prerequisite("MATH 460", "MATH 361").
+prerequisites("MATH 461", ["MATH 361"]).
 
-prerequisite("MATH 461", "MATH 361").
 
-%  prerequisite("MATH 461", "MATH 361"): MATH 461 -> MATH 361
+prerequisites(Course, Requisite) :- 
+    % writeln(["corequisite:", Course]), 
+    corequisite(Course, Requisite).
 
-prerequisite(Course, Requisite) :- corequisite(Course, Requisite).
-% prerequisite(Course, Requisite) :- atom(Course), atom(Requisite), prerequisite(Course, Prerequisite), prerequisite(Prerequisite, Requisite).
 
-prerequisites(Course, Requisite) :- prerequisite(Course, Requisite).
-prerequisites(Course, Requisite) :- prerequisite(Middle, Requisite), prerequisites(Course, Middle).
+prerequisite(Course, Requisite) :- prerequisites(Course, Requisites), member(Requisite, Requisites).
 
-prerequisites_list(Course, Requisites) :- 
-    setof(Requisite, prerequisites(Course, Requisite), Requisites). 
-    % reverse(Requisites, ReversedReducedRequisites).
+prerequisite(Course, Requisite) :- prerequisites(Course, Middles), member(Middle, Middles), prerequisite(Middle, Requisite).
+% prerequisite(Course, Requisite) :- prerequisite(Course, Middles), member(Middle, Middles), prerequisites(Middle, Requisite).
 
-% requisites_to_ugraph(Predicate, Course, Graph) :-  Predicate(Course, Requisite), Graph = [Course-[Requsite]].
-% prerequisites_to_ugraph(Course, Graph) :-  requisites_to_ugraph(prerequisite, Course, Graph).
+% prerequisites_all(Course, Requisites) :- findall(Courses, prerequisites(Course, Courses), Requisites).
 
-% prerequisite_sorted([]).
-prerequisite_sorted([_]).
-prerequisite_sorted([Course, Requisite]) :- \+(prerequisites(Course, Requisite)).
-prerequisite_sorted([Course|[Requisite|Tail]]) :- prerequisite_sorted([Course, Requisite]), prerequisite_sorted([Requisite|Tail]).
+prerequisites_all(Course, RequisiteSet) :- findall(C, prerequisite(Course, C), Requisites), list_to_set(Requisites, RequisiteSet).
+% prerequisites(Course, FlatRequisites) :-
+%     % writeln(["prerequisites:", Course]),
+%     prerequisites(Course, Middle), 
+%     maplist(prerequisites, Middle, Requisite), 
+%     flatten(Requisite, FlatRequisites).
+
+% prerequisite(Course, Requisite) :- prerequisites(Course, Requisites), member(Requisite, Requisites).
+% prerequisite(Course, FlatRequisitesSet) :- 
+%     prerequisites(Course, Requisites), 
+%     maplist(prerequisite, Requisites, Requisite), 
+%     flatten(Requisite, FlatRequisites), 
+%     list_to_set(FlatRequisites, FlatRequisitesSet).
+%
